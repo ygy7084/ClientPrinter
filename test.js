@@ -1,12 +1,19 @@
 var hummus  = require('hummus');
+var {exec} = require('child_process');
 
 /* GET users listing. */
 var pdfWriter = hummus.createWriterToModify('./tickets.pdf', {
     modifiedFilePath: './ab.pdf'
 });
 
+
+// pdfWriter.getEvents().on('OnCatalogWrite', function() {
+//     console.log('exec');
+//     exec('sumatraPDF'+' '+'ab.pdf'+' '+'-print-to-default');
+// })
+
 var pageModifier = new hummus.PDFPageModifier(pdfWriter,0);
-// pdfWriter.appendPDFPagesFromPDF('./tickets.pdf');
+
 
 let axis = {
     seat_class:{x:270,y:230,size:15},
@@ -187,5 +194,12 @@ for(let i=0;i<Math.ceil(data.seats_picked.length/5);i++) {
 
 
 pageModifier.endContext().writePage();
-pdfWriter.end()
+
+new Promise((resolve, reject) => {
+    pdfWriter.end();
+    resolve();
+}).then(() => {
+    console.log('exec');
+    exec('sumatraPDF'+' '+'ab.pdf'+' '+'-print-to-default -print-settings "1"');
+})
 

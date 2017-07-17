@@ -6,7 +6,7 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var hummus  = require('hummus');
 var tmp = require('tmp');
-
+var {exec} = require('child_process')
 var app = express();
 
 // uncomment after placing your favicon in /public
@@ -17,16 +17,20 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.post('/ticket', function(req, res){
+app.get('/ticket', function(req, res){
 console.log('hi');
   /* GET users listing. */
-    var pdfWriter = hummus.createWriterToModify('./tickets.pdf', {
+    var pdfWriter = hummus.createWriterToModify('tickets.pdf', {
         modifiedFilePath: './ab.pdf'
     });
 
     var pageModifier = new hummus.PDFPageModifier(pdfWriter,0);
-// pdfWriter.appendPDFPagesFromPDF('./tickets.pdf');
+pdfWriter.appendPDFPagesFromPDF('./tickets.pdf');
 
+pdfWriter.appendPDFPagesFromPDF('./tickets.pdf');
+pdfWriter.appendPDFPagesFromPDF('./tickets.pdf');
+pdfWriter.appendPDFPagesFromPDF('./tickets.pdf');
+pdfWriter.appendPDFPagesFromPDF('./tickets.pdf');
     let axis = {
         seat_class:{x:270,y:230,size:15},
         date:{x:312, y:210,size:15},
@@ -34,20 +38,52 @@ console.log('hi');
         leftBase:{x:10, y:195, size:9},
         rightBase:{x:150, y:195, size:9}
     };
-    /*
-    req.body.data의 모습은 다음과 같다.
-    {
-    show_date,
-    seat_class,
-    seat_price,
-    seats_picked :[
-        {
-            col,
-            num
-        }
-    ]
-    }
-     */
+    let n=0;
+    console.log(n++);
+     if(!req.body || !req.body.data) {
+        req.body.data = [{
+            show_date:new Date(2017,7,20,3,50),
+            seat_class:'R',
+            seat_price:50000,
+            seat_position:{
+                col:'가',
+                num:5
+            }
+        },{
+            show_date:new Date(2017,7,20,3,50),
+            seat_class:'R',
+            seat_price:50000,
+            seat_position:{
+                col:'가',
+                num:5
+            }
+        },{
+            show_date:new Date(2017,7,20,3,50),
+            seat_class:'R',
+            seat_price:50000,
+            seat_position:{
+                col:'가',
+                num:5
+            }
+        },{
+            show_date:new Date(2017,7,20,3,50),
+            seat_class:'R',
+            seat_price:50000,
+            seat_position:{
+                col:'가',
+                num:5
+            }
+        },{
+            show_date:new Date(2017,7,20,3,50),
+            seat_class:'R',
+            seat_price:50000,
+            seat_position:{
+                col:'가',
+                num:5
+            }
+        }]
+     }
+    console.log(n++);
 
     const days=['일','월','화','수','목','금','토'];
     let dateObj = new Date(req.body.data[0].show_date);
@@ -57,23 +93,31 @@ console.log('hi');
     let hours =dateObj.getHours() ;
     let minutes =dateObj.getMinutes();
 
+    console.log(n++);
+
     let data = {
         seat_class:req.body.data[0].seat_class,
         date: month+'/'+date+'·'+days[day],
         time: hours+'시'+minutes+'분',
         datetime:'공연시간 : '+month+'.'+date+'.'+days[day]+' / '+ hours+'시 '+minutes+'분',
         seat_price:req.body.data[0].seat_price,
-        number : '인원 : '+req.body.data.length+' 명',
+        number : req.body.data.length,
         seats_picked: []
     };
 
+    console.log(n++);
+
+    
     for(let d of req.body.data) {
-        obj.seats_picked.push({
+        data.seats_picked.push({
             col:d.seat_position.col,
             num:d.seat_position.num
         })
     }
 
+    console.log(n++);
+
+    
     if(data.seat_class==='VIP')
         axis.seat_class.x=263;
     if(data.date.length===5)
@@ -92,6 +136,9 @@ console.log('hi');
     }
 
 
+    console.log(n++);
+
+    
     pageModifier.startContext().getContext()
         .writeText(
             data.seat_class,
@@ -164,6 +211,9 @@ console.log('hi');
             {font:pdfWriter.getFontForFile('./malgunbd.ttf'),size:axis.rightBase.size,color:'black'}
         );
 
+    console.log(n++);
+
+    
     for(let i=0;i<Math.ceil(data.seats_picked.length/2);i++) {
         let con = pageModifier.startContext().getContext();
         let index = i*2;
@@ -190,10 +240,19 @@ console.log('hi');
         )
     }
 
-    pageModifier.endContext().writePage();
-    pdfWriter.end();
+    console.log(n++);
 
- res.end();
+    console.log('final');
+    pageModifier.endContext().writePage();
+    new Promise((resolve, reject) => {
+        pdfWriter.end();
+        resolve()
+    }).then(() => {
+        console.log('exec');
+        exec('sumatraPDF'+' '+'ab.pdf'+' '+'-print-to-default -print-settings "1"');
+         res.end();
+    })
+
 });
 
 
