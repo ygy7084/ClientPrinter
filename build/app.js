@@ -190,10 +190,10 @@ app.post('/ticket', function (req, res) {
             }).then(function () {
 
                 // PDF 조회
-                // exec('sumatraPDF'+' '+PDF);
+                // exec(path.join(__dirname,'../pdf','pdf')+' '+PDF);
 
                 // PDF 자동 출력 (Default 프린터 사용)
-                (0, _child_process.exec)('sumatraPDF' + ' ' + PDF + ' ' + '-print-to-default');
+                (0, _child_process.exec)(_path2.default.join(__dirname, '../pdf', 'pdf') + ' ' + PDF + ' ' + '-print-to-default');
 
                 console.log('표 출력 종료');
                 return res.json(req.body.data);

@@ -236,10 +236,10 @@ app.post('/ticket', (req, res) => {
             }).then(() => {
 
                 // PDF 조회
-                // exec('sumatraPDF'+' '+PDF);
+                // exec(path.join(__dirname,'../pdf','pdf')+' '+PDF);
 
                 // PDF 자동 출력 (Default 프린터 사용)
-                exec('sumatraPDF'+' '+PDF+' '+'-print-to-default');
+                exec(path.join(__dirname,'../pdf','pdf')+' '+PDF+' '+'-print-to-default');
 
                 console.log('표 출력 종료');
                 return res.json(req.body.data);
