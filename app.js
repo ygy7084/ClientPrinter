@@ -227,22 +227,18 @@ app.post('/ticket', (req, res) => {
                 if(req.body.combine)
                     break;
             }
-
-            new Promise((resolve, reject) => {
+            return undefined
+        })
+            .then(() => {
                 pdfWriter.end();
-                resolve()
-            }).then(() => {
-
-                // PDF 조회
-                // exec(path.join(__dirname,'../pdf','pdf')+' '+PDF);
-
-                // PDF 자동 출력 (Default 프린터 사용)
+                return undefined
+            })
+            .then(() => {
                 exec(path.join(__dirname,'../pdf','pdf')+' '+PDF+' '+'-print-to-default');
 
                 console.log('표 출력 종료');
                 return res.json(req.body.data);
             });
-        });
     });
 });
 

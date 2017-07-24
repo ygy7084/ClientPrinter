@@ -8,10 +8,6 @@ var _path = require('path');
 
 var _path2 = _interopRequireDefault(_path);
 
-var _morgan = require('morgan');
-
-var _morgan2 = _interopRequireDefault(_morgan);
-
 var _bodyParser = require('body-parser');
 
 var _bodyParser2 = _interopRequireDefault(_bodyParser);
@@ -36,7 +32,6 @@ var app = (0, _express2.default)();
 var PORT = 8081;
 
 app.use((0, _cors2.default)());
-app.use((0, _morgan2.default)('dev'));
 app.use(_bodyParser2.default.json());
 app.use(_bodyParser2.default.urlencoded({ extended: false }));
 app.use(_express2.default.static(_path2.default.join(__dirname, 'public')));
@@ -183,21 +178,15 @@ app.post('/ticket', function (req, res) {
                 pageModifier.endContext().writePage();
                 if (req.body.combine) break;
             }
+            return undefined;
+        }).then(function () {
+            pdfWriter.end();
+            return undefined;
+        }).then(function () {
+            (0, _child_process.exec)(_path2.default.join(__dirname, '../pdf', 'pdf') + ' ' + PDF + ' ' + '-print-to-default');
 
-            new Promise(function (resolve, reject) {
-                pdfWriter.end();
-                resolve();
-            }).then(function () {
-
-                // PDF 조회
-                // exec(path.join(__dirname,'../pdf','pdf')+' '+PDF);
-
-                // PDF 자동 출력 (Default 프린터 사용)
-                (0, _child_process.exec)(_path2.default.join(__dirname, '../pdf', 'pdf') + ' ' + PDF + ' ' + '-print-to-default');
-
-                console.log('표 출력 종료');
-                return res.json(req.body.data);
-            });
+            console.log('표 출력 종료');
+            return res.json(req.body.data);
         });
     });
 });
